@@ -1,0 +1,7 @@
+#Fri Sep 30 17:09:40 BST 2016
+base.0=/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_c2cbf4e50f447a227d4b15ae544bc0fb62d40ae7
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_2099a6fb81fdfa8c4b4770de9c3951723dc4f414/classes.dex
+base.1=/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_2099a6fb81fdfa8c4b4770de9c3951723dc4f414
+file.0=/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_c2cbf4e50f447a227d4b15ae544bc0fb62d40ae7/classes.dex
