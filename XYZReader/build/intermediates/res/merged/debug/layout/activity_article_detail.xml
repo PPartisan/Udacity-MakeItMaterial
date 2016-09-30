@@ -13,7 +13,7 @@
 
             <!--suppress AndroidLintContentDescription -->
             <ImageView
-                android:id="@id/photo"
+                android:id="@+id/photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop" />
@@ -36,6 +36,11 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_share"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
         app:fabSize="normal"/>
 
 </android.support.design.widget.CoordinatorLayout>

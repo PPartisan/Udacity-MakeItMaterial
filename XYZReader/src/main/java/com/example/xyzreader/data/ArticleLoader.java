@@ -1,8 +1,8 @@
 package com.example.xyzreader.data;
 
 import android.content.Context;
-import android.content.CursorLoader;
 import android.net.Uri;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 import android.widget.Toast;
 

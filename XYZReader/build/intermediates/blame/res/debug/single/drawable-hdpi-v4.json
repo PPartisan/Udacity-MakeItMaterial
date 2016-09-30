@@ -80,12 +80,12 @@
         "source": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/drawable-hdpi-v4/abc_list_pressed_holo_dark.9.png"
     },
     {
-        "merged": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/res/merged/debug/drawable-hdpi-v4/abc_ic_star_black_36dp.png",
-        "source": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/drawable-hdpi-v4/abc_ic_star_black_36dp.png"
-    },
-    {
         "merged": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/res/merged/debug/drawable-hdpi-v4/abc_ic_menu_paste_mtrl_am_alpha.png",
         "source": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/drawable-hdpi-v4/abc_ic_menu_paste_mtrl_am_alpha.png"
+    },
+    {
+        "merged": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/res/merged/debug/drawable-hdpi-v4/abc_ic_star_black_36dp.png",
+        "source": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/drawable-hdpi-v4/abc_ic_star_black_36dp.png"
     },
     {
         "merged": "/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/res/merged/debug/drawable-hdpi-v4/abc_ic_star_half_black_48dp.png",

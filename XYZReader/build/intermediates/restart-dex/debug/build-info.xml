@@ -4,33 +4,64 @@
     density="xhdpi"
     format="8"
     plugin-version="2.2.0"
-    timestamp="26277188242012"
+    timestamp="44162046445423"
     token="6329206632374405805"
-    verifier="FULL_BUILD_REQUESTED" >
+    verifier="COLD_SWAP_REQUESTED" >
 
     <task
         name="javac"
-        duration="574" />
+        duration="151" />
     <task
         name="instant-run-dex"
         duration="0" />
     <task
         name="instant-run-transform"
-        duration="176" />
+        duration="26" />
     <task
         name="verifier"
-        duration="6" />
+        duration="4" />
 
     <artifact
-        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/outputs/apk/XYZReader-debug.apk"
-        type="MAIN" />
+        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/instant-run-resources/resources-debug.ir.ap_"
+        type="RESOURCES" />
+    <artifact
+        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_0/classes.dex"
+        type="DEX" />
+    <artifact
+        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_4/classes.dex"
+        type="DEX" />
+    <artifact
+        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_7/classes.dex"
+        type="DEX" />
+    <artifact
+        location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_3/classes.dex"
+        type="DEX" />
 
     <build
-        timestamp="26277188242012"
+        timestamp="43943643162495"
         verifier="FULL_BUILD_REQUESTED" >
         <artifact
             location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/outputs/apk/XYZReader-debug.apk"
             type="MAIN" />
+    </build>
+    <build
+        timestamp="44162046445423"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/instant-run-resources/resources-debug.ir.ap_"
+            type="RESOURCES" />
+        <artifact
+            location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_0/classes.dex"
+            type="DEX" />
+        <artifact
+            location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_4/classes.dex"
+            type="DEX" />
+        <artifact
+            location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_7/classes.dex"
+            type="DEX" />
+        <artifact
+            location="/home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/build/intermediates/transforms/dex/debug/folders/1000/5/slice_3/classes.dex"
+            type="DEX" />
     </build>
 
 </instant-run>
