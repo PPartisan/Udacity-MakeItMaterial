@@ -1,9 +1,13 @@
 package com.example.xyzreader.ui;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -11,9 +15,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.util.TypedValue;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.View;
+import android.view.Window;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
@@ -23,28 +29,41 @@ import com.example.xyzreader.util.ViewUtils;
 /**
  * An activity representing a single Article detail screen, letting you swipe between articles.
  */
-public class ArticleDetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>, ArticleDetailFragment.Callbacks {
+public class ArticleDetailActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener, ArticleDetailFragment.Callbacks {
 
-    private ImageView mBannerImageView;
+    private static final String TAG = ArticleDetailActivity.class.getSimpleName();
+
+    public static final String EXCLUDE_TARGET_NAME_EXTRA = TAG + ".EXCLUDE_TARGET_NAME_EXTRA";
 
     private Cursor mCursor;
     private long mStartId;
 
-    private long mSelectedItemId;
-    private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
-    private int mTopInset;
-
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
 
+    private FloatingActionButton mFab;
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+        if (isLollipopWithAnimTarget()) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+            final Transition transition = new Slide();
+            transition.excludeTarget(getExcludeTargetNameExtra(), true);
+            transition.excludeTarget(android.R.id.statusBarBackground, true);
+            getWindow().setEnterTransition(transition);
+        }
 
         getWindow().getDecorView().setSystemUiVisibility(
                 ViewUtils.getSystemUiVisibilityFlags(getWindow())
         );
+
+        ActivityCompat.postponeEnterTransition(this);
+
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_article_detail);
 
@@ -57,57 +76,25 @@ public class ArticleDetailActivity extends AppCompatActivity
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged(state);
-//                mUpButton.animate()
-//                        .alpha((state == ViewPager.SCROLL_STATE_IDLE) ? 1f : 0f)
-//                        .setDuration(300);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (mCursor != null) {
-                    mCursor.moveToPosition(position);
-                }
-                mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
-//                updateUpButtonPosition();
-            }
-        });
-
-//        mUpButtonContainer = findViewById(R.id.up_container);
-//
-//        mUpButton = findViewById(R.id.action_up);
-//        mUpButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                onSupportNavigateUp();
-//            }
-//        });
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            mUpButtonContainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-//                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//                @Override
-//                public WindowInsets onApplyWindowInsets(View view, WindowInsets windowInsets) {
-//                    view.onApplyWindowInsets(windowInsets);
-//                    mTopInset = windowInsets.getSystemWindowInsetTop();
-//                    mUpButtonContainer.setTranslationY(mTopInset);
-//                    updateUpButtonPosition();
-//                    return windowInsets;
-//                }
-//            });
-//        }
-
-        mBannerImageView = (ImageView) findViewById(R.id.photo);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(this);
 
         if (savedInstanceState == null) {
             if (getIntent() != null && getIntent().getData() != null) {
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
-                mSelectedItemId = mStartId;
             }
         }
+
+    }
+
+    private String getExcludeTargetNameExtra() {
+        return getIntent().getStringExtra(EXCLUDE_TARGET_NAME_EXTRA);
+    }
+
+    private boolean isLollipopWithAnimTarget() {
+        final boolean isLollipop = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+        final boolean hasAnimTarget = (getExcludeTargetNameExtra() != null);
+        return (isLollipop && hasAnimTarget);
     }
 
     @Override
@@ -143,47 +130,42 @@ public class ArticleDetailActivity extends AppCompatActivity
     }
 
     @Override
-    public void updateBannerImage(Bitmap bannerBitmap) {
-        mBannerImageView.setImageBitmap(bannerBitmap);
+    public void onClick(View view) {
+        if (mCursor.moveToPosition(mPager.getCurrentItem())) {
+            Intent shareTextIntent = new Intent(Intent.ACTION_SEND);
+            final String text =
+                    mCursor.getString(mCursor.getColumnIndex(ItemsContract.ItemsColumns.TITLE));
+            shareTextIntent.putExtra(Intent.EXTRA_TEXT, text);
+            shareTextIntent.setType("text/plain");
+            startActivity(shareTextIntent);
+        }
     }
 
-//    public void onUpButtonFloorChanged(long itemId, ArticleDetailFragment fragment) {
-//        if (itemId == mSelectedItemId) {
-//            mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
-//            updateUpButtonPosition();
-//        }
-//    }
-
-//    private void updateUpButtonPosition() {
-//        int upButtonNormalBottom = mTopInset + mUpButton.getHeight();
-//        mUpButton.setTranslationY(Math.min(mSelectedItemUpButtonFloor - upButtonNormalBottom, 0));
-//    }
+    @Override
+    public void onScrollChange(int y, int oldY) {
+        if (oldY > y && !mFab.isShown()) {
+            mFab.show();
+        } else if (y > oldY && mFab.isShown()) {
+            mFab.hide();
+        }
+    }
 
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        public MyPagerAdapter(FragmentManager fm) {
+        MyPagerAdapter(FragmentManager fm) {
             super(fm);
-        }
-
-        @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            super.setPrimaryItem(container, position, object);
-            ArticleDetailFragment fragment = (ArticleDetailFragment) object;
-            if (fragment != null) {
-//                mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
-//                updateUpButtonPosition();
-            }
         }
 
         @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), position);
         }
 
         @Override
         public int getCount() {
             return (mCursor != null) ? mCursor.getCount() : 0;
         }
+
     }
 }

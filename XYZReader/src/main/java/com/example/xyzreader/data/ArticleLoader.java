@@ -44,24 +44,4 @@ public class ArticleLoader extends CursorLoader {
         int BODY = 7;
     }
 
-    class Account {
-
-        String name, address;
-        double balance;
-
-        void display() {
-            Log.i(Account.class.getSimpleName(), this.toString());
-        }
-
-        void displayToast(Context context) {
-            Toast.makeText(context, this.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public String toString() {
-            return "Name: " + name + ", Address: " + address + ", Balance: " + balance;
-        }
-
-    }
-
 }

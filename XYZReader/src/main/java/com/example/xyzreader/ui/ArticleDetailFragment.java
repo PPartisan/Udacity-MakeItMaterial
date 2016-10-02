@@ -1,34 +1,20 @@
 package com.example.xyzreader.ui;
 
 
-
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
-import android.text.Html;
-import android.text.format.DateUtils;
+import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+import com.example.xyzreader.util.TextUtils;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -48,26 +35,20 @@ import com.example.xyzreader.data.ArticleLoader;
  * tablets) or a {@link ArticleDetailActivity} on handsets.
  */
 public class ArticleDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, NestedScrollView.OnScrollChangeListener {
     private static final String TAG = "ArticleDetailFragment";
 
+    public static final String POSITION_KEY = "pos_key";
+
     public static final String ARG_ITEM_ID = "item_id";
-    private static final float PARALLAX_FACTOR = 1.25f;
 
     private Callbacks mCallbacks;
 
-    private Cursor mCursor;
-    private long mItemId;
-    private View mRootView;
-    private int mMutedColor = 0xFF333333;
-    private ObservableScrollView mScrollView;
-    private DrawInsetsFrameLayout mDrawInsetsFrameLayout;
-    private ColorDrawable mStatusBarColorDrawable;
+    private ImageView mPhoto;
+    private View mMetaBar;
 
-    private int mTopInset;
-    private int mScrollY;
-    private boolean mIsCard = false;
-    private int mStatusBarFullOpacityBottom;
+    private Cursor mCursor;
+    private int mDarkVibrantColor = 0xFF333333;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,9 +57,10 @@ public class ArticleDetailFragment extends Fragment implements
     public ArticleDetailFragment() {
     }
 
-    public static ArticleDetailFragment newInstance(long itemId) {
+    public static ArticleDetailFragment newInstance(long itemId, int position) {
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
+        arguments.putInt(POSITION_KEY, position);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -90,28 +72,9 @@ public class ArticleDetailFragment extends Fragment implements
         try {
             mCallbacks = (Callbacks) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(
-                    context.toString() + " must implement " + Callbacks.class.getSimpleName()
-            );
+            throw new ClassCastException(context.toString() + " must implement "
+                    + Callbacks.class.getSimpleName());
         }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mItemId = getArguments().getLong(ARG_ITEM_ID);
-        }
-
-        mIsCard = getResources().getBoolean(R.bool.detail_is_card);
-        mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
-                R.dimen.detail_card_top_margin);
-        setHasOptionsMenu(true);
-    }
-
-    public ArticleDetailActivity getActivityCast() {
-        return (ArticleDetailActivity) getActivity();
     }
 
     @Override
@@ -128,32 +91,36 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
-        mDrawInsetsFrameLayout = (DrawInsetsFrameLayout)
-                mRootView.findViewById(R.id.draw_insets_frame_layout);
-        mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
+        View rootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
+
+        mPhoto = (ImageView) rootView.findViewById(R.id.photo);
+        ViewCompat.setTransitionName(mPhoto, getString(R.string.transition_template_image, getPosition()));
+
+        mMetaBar = rootView.findViewById(R.id.meta_bar);
+
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.fad_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onInsetsChanged(Rect insets) {
-                mTopInset = insets.top;
+            public void onClick(View view) {
+                getActivity().onBackPressed();
             }
         });
 
-        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
+        NestedScrollView body =
+                (NestedScrollView) rootView.findViewById(R.id.fad_nested_scrollview);
+        body.setOnScrollChangeListener(this);
 
-        mStatusBarColorDrawable = new ColorDrawable(0);
+        AppBarLayout appBar = (AppBarLayout) rootView.findViewById(R.id.fad_appbar_layout);
+        ViewCompat.setTransitionName(appBar, getString(R.string.transition_template_text, getPosition()));
 
-//        mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-//                        .setType("text/plain")
-//                        .setText("Some sample text")
-//                        .getIntent(), getString(R.string.action_share)));
-//            }
-//        });
-        bindViews();
-//        updateStatusBar();
-        return mRootView;
+        bindViews(rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -162,83 +129,47 @@ public class ArticleDetailFragment extends Fragment implements
         super.onDetach();
     }
 
-//    private void updateStatusBar() {
-//        int color = 0;
-//        if (mPhotoView != null && mTopInset != 0 && mScrollY > 0) {
-//            float f = progress(mScrollY,
-//                    mStatusBarFullOpacityBottom - mTopInset * 3,
-//                    mStatusBarFullOpacityBottom - mTopInset);
-//            color = Color.argb((int) (255 * f),
-//                    (int) (Color.red(mMutedColor) * 0.9),
-//                    (int) (Color.green(mMutedColor) * 0.9),
-//                    (int) (Color.blue(mMutedColor) * 0.9));
-//        }
-//        mStatusBarColorDrawable.setColor(color);
-//        mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
-//    }
-
-    static float progress(float v, float min, float max) {
-        return constrain((v - min) / (max - min), 0, 1);
-    }
-
-    static float constrain(float val, float min, float max) {
-        if (val < min) {
-            return min;
-        } else if (val > max) {
-            return max;
-        } else {
-            return val;
-        }
-    }
-
-    private void bindViews() {
-        if (mRootView == null) {
+    private void bindViews(final View rootView) {
+        if (rootView == null) {
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+        TextView titleView = (TextView) rootView.findViewById(R.id.article_title);
+        TextView bylineView = (TextView) rootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+        TextView bodyView = (TextView) rootView.findViewById(R.id.article_body);
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
-            mRootView.setAlpha(0);
-            mRootView.setVisibility(View.VISIBLE);
-            mRootView.animate().alpha(1);
+            rootView.setAlpha(0);
+            rootView.setVisibility(View.VISIBLE);
+            rootView.animate().alpha(1);
+
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            bylineView.setText(Html.fromHtml(
-                    DateUtils.getRelativeTimeSpanString(
-                            mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
-                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_ALL).toString()
-                            + " by <font color='#ffffff'>"
-                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                            + "</font>"));
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
+            bylineView.setText(TextUtils.getByLineText(getResources(), mCursor, true));
+            bodyView.setText(TextUtils.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
-                        public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
+                        public void onResponse(final ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
-                                Palette p = Palette.generate(bitmap, 12);
-                                mMutedColor = p.getDarkVibrantColor(0xFF333333);
-                                //mPhotoView.setImageBitmap(imageContainer.getBitmap());
-                                mCallbacks.updateBannerImage(imageContainer.getBitmap());
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
-//                                updateStatusBar();
+                                new Palette.Builder(bitmap)
+                                        .maximumColorCount(12)
+                                        .generate(new PaletteListener(bitmap));
                             }
                         }
 
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-
+                            if (getActivity() != null) {
+                                ActivityCompat.startPostponedEnterTransition(getActivity());
+                            }
                         }
                     });
         } else {
-            mRootView.setVisibility(View.GONE);
+            rootView.setVisibility(View.GONE);
             titleView.setText("N/A");
             bylineView.setText("N/A" );
             bodyView.setText("N/A");
@@ -247,7 +178,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return ArticleLoader.newInstanceForItemId(getActivity(), mItemId);
+        return ArticleLoader.newInstanceForItemId(getActivity(), getItemId());
     }
 
     @Override
@@ -266,28 +197,49 @@ public class ArticleDetailFragment extends Fragment implements
             mCursor = null;
         }
 
-        bindViews();
+        bindViews(getView());
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mCursor = null;
-        bindViews();
+        bindViews(getView());
     }
 
-//    public int getUpButtonFloor() {
-//        if (mPhotoContainerView == null || mPhotoView.getHeight() == 0) {
-//            return Integer.MAX_VALUE;
-//        }
-//
-//        // account for parallax
-//        return mIsCard
-//                ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
-//                : mPhotoView.getHeight() - mScrollY;
-//    }
+    private long getItemId() {
+        return getArguments().getLong(ARG_ITEM_ID);
+    }
+
+    private int getPosition() {
+        return getArguments().getInt(POSITION_KEY);
+    }
+
+    @Override
+    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        mCallbacks.onScrollChange(scrollY, oldScrollY);
+    }
 
     interface Callbacks {
-        void updateBannerImage(Bitmap bannerBitmap);
+        void onScrollChange(int y, int oldY);
+    }
+
+    private class PaletteListener implements Palette.PaletteAsyncListener {
+
+        private final Bitmap bitmap;
+
+        private PaletteListener(Bitmap bitmap) {
+            this.bitmap = bitmap;
+        }
+
+        @Override
+        public void onGenerated(Palette palette) {
+            mDarkVibrantColor = palette.getDarkVibrantColor(mDarkVibrantColor);
+            mPhoto.setImageBitmap(bitmap);
+            mMetaBar.setBackgroundColor(mDarkVibrantColor);
+            if (getActivity() != null) {
+                ActivityCompat.startPostponedEnterTransition(getActivity());
+            }
+        }
     }
 
 }

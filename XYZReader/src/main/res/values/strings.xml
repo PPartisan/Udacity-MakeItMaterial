@@ -9,4 +9,9 @@
 
     <string name="up">Up</string>
 
+    <string name="by_line">%1$s by %2$s</string>
+
+    <string name="transition_template_image">transition_template_image%1$d</string>
+    <string name="transition_template_text">transition_template_text%1$d</string>
+
 </resources>

@@ -51,7 +51,7 @@ MERGED from [com.android.support:animated-vector-drawable:24.2.1] /home/tom/Andr
 	android:icon
 		ADDED from /home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/src/main/AndroidManifest.xml:13:9-43
 	android:theme
-		ADDED from /home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/src/main/AndroidManifest.xml:15:9-43
+		ADDED from /home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/src/main/AndroidManifest.xml:15:9-40
 activity#com.example.xyzreader.ui.ArticleListActivity
 ADDED from /home/tom/Android-Projects/Udacity/MakeItMaterial/XYZReader/src/main/AndroidManifest.xml:17:9-24:20
 	android:label

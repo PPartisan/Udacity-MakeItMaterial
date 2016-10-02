@@ -8,4 +8,8 @@
     <dimen name="fab_press_translation_z">6dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
 
+    <dimen name="card_padding_fit_screen">-3dp</dimen>
+
+    <dimen name="app_bar_overlay">0dp</dimen>
+
 </resources>

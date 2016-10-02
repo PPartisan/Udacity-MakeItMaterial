@@ -14,7 +14,7 @@ public final class ViewUtils {
         int systemFlags = window.getDecorView().getSystemUiVisibility();
 
         if (sdkInt >= Build.VERSION_CODES.LOLLIPOP) {
-            systemFlags |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            systemFlags = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
         }
 
         return systemFlags;
