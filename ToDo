@@ -1,0 +1,27 @@
+Issues and Solutions:
+
+Main
+- Images do not scale properly in grid view.
+	* Alter layouts such that image occupies entire background
+	* Apply Scrim
+	* Keep text
+- Lack of contrast in text.
+	* Adjust Text Colour such that it's inline with material specs
+- App colours lack contrast (check MD specs)
+	* Choose new colour sceme based on MD specs
+- Ensure text fonts are the same.
+	* If not, apply fonts consistently
+- No transition animations.
+	* Apply transition animations between image on click and in scrollable toolbar on Detail view.
+	* Load in other content in stages (i.e. from bottom).
+
+Detail
+- Banner image scales poorly.
+- Peculiarly large amount of white space before title.
+	* Consult specs for correct AppBar height. Use Co-ordinator layout to apply parallax.
+- I didn't know pages were scrollable! Should be a hint for this.
+	* Could offer tabs, or could animated pages to slide in on load?
+
+Done
+- Margins already look good on landscape.
+- App scales acceptably on different devices.
